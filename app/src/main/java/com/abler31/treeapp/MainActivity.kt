@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,11 +36,11 @@ class MainActivity : ComponentActivity() {
         val childNode1 = Node("Child 1", rootNode)
         val childNode2 = Node("Child 2", rootNode)
 
-        for (i in 3..15) {
-            childNode1.children.add(Node("Child $i", rootNode))
-        }
         rootNode.children.add(childNode1)
         rootNode.children.add(childNode2)
+        for (i in 3..15) {
+            childNode1.children.add(Node("Child $i", childNode1))
+        }
         setContent {
             TreeAppTheme {
                 Surface(
@@ -83,7 +84,7 @@ fun TreeScreenPreview() {
 
 @Composable
 fun TreeContent(node: Node) {
-    var currentNode by remember {
+    var currentNode by rememberSaveable {
         mutableStateOf(node)
     }
 
