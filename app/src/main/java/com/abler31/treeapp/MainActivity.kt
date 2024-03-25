@@ -3,6 +3,7 @@ package com.abler31.treeapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,6 +16,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -30,10 +35,9 @@ class MainActivity : ComponentActivity() {
         val childNode1 = Node("Child 1", rootNode)
         val childNode2 = Node("Child 2", rootNode)
 
-        for (i in 1..15) {
+        for (i in 3..15) {
             childNode1.children.add(Node("Child $i", rootNode))
         }
-
         rootNode.children.add(childNode1)
         rootNode.children.add(childNode2)
         setContent {
@@ -62,19 +66,39 @@ fun TreeScreen(rootNode: Node) {
 @Preview
 @Composable
 fun TreeScreenPreview() {
+    val rootNode = Node("Root")
+    val childNode1 = Node("Child 1", rootNode)
+    val childNode2 = Node("Child 2", rootNode)
+
+    for (i in 1..15) {
+        childNode1.children.add(Node("Child $i", rootNode))
+    }
+
+    rootNode.children.add(childNode1)
+    rootNode.children.add(childNode2)
     TreeAppTheme {
-        TreeScreen(rootNode = Node("name1"))
+        TreeScreen(rootNode = childNode1)
     }
 }
 
 @Composable
 fun TreeContent(node: Node) {
+    var currentNode by remember {
+        mutableStateOf(node)
+    }
+
+    fun updateUi(newNode: Node) {
+        currentNode = newNode
+    }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (node.parent != null) {
+        if (currentNode.parent != null) {
             Text(text = "Parent")
-            NodeItem(node = node.parent)
+            NodeItem(
+                node = currentNode.parent!!,
+                onItemClick = { updateUi(currentNode.parent!!) })
         }
         Text(text = "Childs")
         LazyColumn(
@@ -82,19 +106,24 @@ fun TreeContent(node: Node) {
                 .fillMaxSize()
 
         ) {
-            items(node.children) { childNode ->
-                NodeItem(node = childNode)
+            items(currentNode.children) { childNode ->
+                NodeItem(
+                    node = childNode,
+                    onItemClick = {
+                        updateUi(it)
+                    })
             }
         }
     }
 }
 
 @Composable
-fun NodeItem(node: Node) {
+fun NodeItem(node: Node, onItemClick: (Node) -> Unit) {
     ElevatedCard(
         modifier = Modifier
             .padding(horizontal = 16.dp, vertical = 8.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable { onItemClick.invoke(node) },
         elevation = CardDefaults.cardElevation(
             defaultElevation = 8.dp
         )
@@ -109,4 +138,3 @@ fun NodeItem(node: Node) {
         )
     }
 }
-
