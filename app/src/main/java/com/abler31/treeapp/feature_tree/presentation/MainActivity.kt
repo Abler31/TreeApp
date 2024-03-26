@@ -1,6 +1,7 @@
 package com.abler31.treeapp.feature_tree.presentation
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
@@ -39,13 +40,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.abler31.treeapp.feature_tree.domain.model.Node
 import com.abler31.treeapp.ui.theme.TreeAppTheme
+import java.security.MessageDigest
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val rootNode = Node("Root")
-
         val childNode1 = Node("Child 1", rootNode)
+        /*val newNode = createNode(rootNode)
+        Log.d("test", newNode.name)*/
         val childNode2 = Node("Child 2", rootNode)
 
         rootNode.children.add(childNode1)
@@ -65,6 +68,28 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+/*private fun generateNodeName(node: Node): String {
+    val hashString = nodeHash(node)
+    // last 20 symbols
+    return hashString.substring(hashString.length - 20)
+}
+
+// Node hash function
+private fun nodeHash(node: Node): String {
+    val md = MessageDigest.getInstance("SHA-256")
+    val hashBytes = md.digest(node.toString().toByteArray())
+    return hashBytes.joinToString("") { "%02x".format(it) }
+}*/
+
+/*private fun createNode(parent: Node?): Node{
+    val node = Node(
+        parent = parent
+    )
+    val name = generateNodeName(node)
+    node.name = name
+    return node
+}*/
 
 @Composable
 fun TreeScreen(rootNode: Node) {
@@ -119,9 +144,11 @@ fun TreeContent(node: Node) {
 
     fun addNode() {
         val newNode = Node(
-            "new node",
-            currentNode
+            name = "Node ${Node.id++}",
+            parent = currentNode
         )
+        //Log.d("test", name)
+        //newNode.name = name
         currentNode.children.add(newNode)
         childrenList.add(newNode)
     }
