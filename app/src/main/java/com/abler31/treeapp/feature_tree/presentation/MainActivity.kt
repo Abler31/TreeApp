@@ -5,11 +5,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -26,7 +28,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.modifier.ModifierLocalReadScope
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.abler31.treeapp.feature_tree.domain.model.Node
@@ -96,33 +104,47 @@ fun TreeContent(node: Node) {
         currentNode.children.toMutableStateList()
     }
 
+    var nodeHasParent by remember {
+        mutableStateOf(currentNode.parent != null)
+    }
+
     fun updateUi(newNode: Node) {
         currentNode = newNode
         childrenList.clear()
         newNode.children.forEach {
             childrenList.add(it)
         }
+        nodeHasParent = (currentNode.parent != null)
+    }
+
+    fun addNode() {
+        val newNode = Node(
+            "new node",
+            currentNode
+        )
+        currentNode.children.add(newNode)
+        childrenList.add(newNode)
     }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (currentNode.parent != null) {
+        if (nodeHasParent) {
             Text(text = "Parent")
             NodeItem(
                 node = currentNode.parent!!,
-                onItemClick = { updateUi(currentNode.parent!!) })
+                onItemClick = { updateUi(currentNode.parent!!) },
+                onDeleteClick = {
+                    currentNode.parent = null
+                    nodeHasParent = false
+                }
+            )
         }
         Text(text = "Children")
         Button(onClick = {
-            val newNode = Node(
-                "new node",
-                currentNode
-            )
-            currentNode.children.add(newNode)
-            childrenList.add(newNode)
+            addNode()
         }) {
-            Text("Добавить узел")
+            Text("Add node")
         }
         LazyColumn(
             modifier = Modifier
@@ -134,25 +156,19 @@ fun TreeContent(node: Node) {
                     node = childNode,
                     onItemClick = {
                         updateUi(it)
+                    },
+                    onDeleteClick = {
+                        childrenList.remove(it)
+                        currentNode.children.remove(it)
+                        updateUi(currentNode)
                     })
             }
         }
     }
 }
-/*fun addNode(currentNode: Node): Node{
-    currentNode.children.add(
-        Node(
-            "new node",
-            currentNode
-        )
-    )
-    val newNode = currentNode.copy()
-    return newNode
-}*/
-
 
 @Composable
-fun NodeItem(node: Node, onItemClick: (Node) -> Unit) {
+fun NodeItem(node: Node, onItemClick: (Node) -> Unit, onDeleteClick: (Node) -> Unit) {
     ElevatedCard(
         modifier = Modifier
             .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -162,13 +178,30 @@ fun NodeItem(node: Node, onItemClick: (Node) -> Unit) {
             defaultElevation = 8.dp
         )
     ) {
-        Text(
-            text = node.name,
-            style = MaterialTheme.typography.bodySmall,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        )
+        val annotatedText = buildAnnotatedString {
+            withStyle(
+                style = SpanStyle(
+                    color = Color.Blue,
+                    fontWeight = FontWeight.Bold
+                )
+            ) {
+                append("Delete")
+            }
+        }
+        Row(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = node.name,
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(0.85f)
+            )
+            ClickableText(text = annotatedText, onClick = {
+                onDeleteClick.invoke(node)
+            })
+        }
     }
 }
