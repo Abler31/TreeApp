@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
@@ -17,9 +18,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -38,7 +42,7 @@ class MainActivity : ComponentActivity() {
 
         rootNode.children.add(childNode1)
         rootNode.children.add(childNode2)
-        for (i in 3..15) {
+        for (i in 3..7) {
             childNode1.children.add(Node("Child $i", childNode1))
         }
         setContent {
@@ -71,7 +75,7 @@ fun TreeScreenPreview() {
     val childNode1 = Node("Child 1", rootNode)
     val childNode2 = Node("Child 2", rootNode)
 
-    for (i in 1..15) {
+    for (i in 1..5) {
         childNode1.children.add(Node("Child $i", rootNode))
     }
 
@@ -88,8 +92,16 @@ fun TreeContent(node: Node) {
         mutableStateOf(node)
     }
 
+    var childrenList = remember {
+        currentNode.children.toMutableStateList()
+    }
+
     fun updateUi(newNode: Node) {
         currentNode = newNode
+        childrenList.clear()
+        newNode.children.forEach {
+            childrenList.add(it)
+        }
     }
 
     Column(
@@ -101,13 +113,23 @@ fun TreeContent(node: Node) {
                 node = currentNode.parent!!,
                 onItemClick = { updateUi(currentNode.parent!!) })
         }
-        Text(text = "Childs")
+        Text(text = "Children")
+        Button(onClick = {
+            val newNode = Node(
+                "new node",
+                currentNode
+            )
+            currentNode.children.add(newNode)
+            childrenList.add(newNode)
+        }) {
+            Text("Добавить узел")
+        }
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
 
         ) {
-            items(currentNode.children) { childNode ->
+            items(childrenList) { childNode ->
                 NodeItem(
                     node = childNode,
                     onItemClick = {
@@ -117,6 +139,17 @@ fun TreeContent(node: Node) {
         }
     }
 }
+/*fun addNode(currentNode: Node): Node{
+    currentNode.children.add(
+        Node(
+            "new node",
+            currentNode
+        )
+    )
+    val newNode = currentNode.copy()
+    return newNode
+}*/
+
 
 @Composable
 fun NodeItem(node: Node, onItemClick: (Node) -> Unit) {
