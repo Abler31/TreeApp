@@ -1,7 +1,6 @@
 package com.abler31.treeapp.feature_tree.presentation
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -21,7 +20,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,7 +39,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.abler31.treeapp.feature_tree.domain.model.Node
 import com.abler31.treeapp.ui.theme.TreeAppTheme
-import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -52,19 +49,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-           /* var treeRoot by remember {
-                mutableStateOf<Node?>(null)
-            }*/
             LaunchedEffect(Unit) {
                 viewModel.treeRoot.observe(this@MainActivity) { treeRootFromLiveData ->
                     // Update node
                     treeRoot = treeRootFromLiveData
-                }
-            }
-            DisposableEffect(Unit) {
-                onDispose {
-                    //viewModel.saveTreeState(treeRoot!!)
-                    Log.d("test", "конец работы")
                 }
             }
             TreeAppTheme {
@@ -76,16 +64,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-
-    override fun onStop() {
-        super.onStop()
-        //viewModel.saveTreeState(treeRoot!!)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        //viewModel.saveTreeState(treeRoot!!)
     }
 }
 
@@ -102,9 +80,9 @@ fun TreeScreen(rootNode: Node, onSaveTreeState: (Node) -> Unit) {
 @Preview
 @Composable
 fun TreeScreenPreview() {
-    val rootNode = Node()
-    val childNode1 = Node(parent = rootNode, name = "sfsf")
-    val childNode2 = Node(parent = rootNode, name = "dgsgscb")
+    val rootNode = Node("cbsg", null)
+    val childNode1 = Node("dgdgg", rootNode)
+    val childNode2 = Node("gjfgdgfd", rootNode)
 
     for (i in 1..5) {
         val node = Node("", rootNode)
@@ -123,7 +101,6 @@ fun TreeContent(node: Node, onSaveTreeState: (Node) -> Unit) {
     var currentNode by rememberSaveable {
         mutableStateOf<Node>(node)
     }
-    //onSaveTreeState(currentNode)
     var childrenList = remember {
         currentNode.children.toMutableStateList()
     }
@@ -143,7 +120,6 @@ fun TreeContent(node: Node, onSaveTreeState: (Node) -> Unit) {
 
     fun addNode() {
         val newNode = Node(
-            "Node ${Node.id}",
             parent = currentNode
         )
         currentNode.children.add(newNode)
@@ -168,7 +144,6 @@ fun TreeContent(node: Node, onSaveTreeState: (Node) -> Unit) {
         }
         Text(text = "Children")
         Button(onClick = {
-            //val rootToSave = deepCopy(currentNode)
             addNode()
         }) {
             Text("Add node")

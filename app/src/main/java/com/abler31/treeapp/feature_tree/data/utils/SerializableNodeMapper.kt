@@ -1,4 +1,4 @@
-package com.abler31.treeapp.feature_tree.data
+package com.abler31.treeapp.feature_tree.data.utils
 
 import com.abler31.treeapp.feature_tree.domain.model.Node
 import com.google.gson.annotations.SerializedName
