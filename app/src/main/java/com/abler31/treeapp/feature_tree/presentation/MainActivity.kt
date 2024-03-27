@@ -26,14 +26,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -41,13 +39,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.lifecycleScope
-import com.abler31.treeapp.feature_tree.data.data_source.TreeStateDataStore
 import com.abler31.treeapp.feature_tree.domain.model.Node
 import com.abler31.treeapp.ui.theme.TreeAppTheme
+import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -107,12 +102,13 @@ fun TreeScreen(rootNode: Node, onSaveTreeState: (Node) -> Unit) {
 @Preview
 @Composable
 fun TreeScreenPreview() {
-    val rootNode = Node("Root")
-    val childNode1 = Node("Child 1", rootNode)
-    val childNode2 = Node("Child 2", rootNode)
+    val rootNode = Node()
+    val childNode1 = Node(parent = rootNode, name = "sfsf")
+    val childNode2 = Node(parent = rootNode, name = "dgsgscb")
 
     for (i in 1..5) {
-        childNode1.children.add(Node("Child $i", rootNode))
+        val node = Node("", rootNode)
+        childNode1.children.add(node)
     }
 
     rootNode.children.add(childNode1)
@@ -128,7 +124,6 @@ fun TreeContent(node: Node, onSaveTreeState: (Node) -> Unit) {
         mutableStateOf<Node>(node)
     }
     //onSaveTreeState(currentNode)
-
     var childrenList = remember {
         currentNode.children.toMutableStateList()
     }
@@ -148,15 +143,12 @@ fun TreeContent(node: Node, onSaveTreeState: (Node) -> Unit) {
 
     fun addNode() {
         val newNode = Node(
-            name = "Node ${Node.id++}",
+            "Node ${Node.id}",
             parent = currentNode
         )
         currentNode.children.add(newNode)
         childrenList.add(newNode)
-        onSaveTreeState(Node(
-            "sdgsdgd",
-            parent = Node("sdfgsdgs")
-        ))
+        onSaveTreeState(currentNode)
     }
 
     Column(
@@ -170,12 +162,13 @@ fun TreeContent(node: Node, onSaveTreeState: (Node) -> Unit) {
                 onDeleteClick = {
                     currentNode.parent = null
                     nodeHasParent = false
-                    //onSaveTreeState(currentNode)
+                    onSaveTreeState(currentNode)
                 }
             )
         }
         Text(text = "Children")
         Button(onClick = {
+            //val rootToSave = deepCopy(currentNode)
             addNode()
         }) {
             Text("Add node")
@@ -195,7 +188,7 @@ fun TreeContent(node: Node, onSaveTreeState: (Node) -> Unit) {
                         childrenList.remove(it)
                         currentNode.children.remove(it)
                         updateUi(currentNode)
-                        //onSaveTreeState(currentNode)
+                        onSaveTreeState(currentNode)
                     })
             }
         }

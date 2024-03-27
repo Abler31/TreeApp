@@ -3,8 +3,11 @@ package com.abler31.treeapp.feature_tree.domain.model
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.security.MessageDigest
 
+@Serializable
 @Parcelize
 data class Node(
     @SerializedName("name") var name: String = "",
@@ -12,8 +15,7 @@ data class Node(
     @SerializedName("children") var children: MutableList<Node> = mutableListOf(),
 ) : Parcelable {
     companion object {
-        var id: Int = 0
-
+        val id = 0
         // Node hash name generation
         private fun generateHash(input: String): String {
             val md = MessageDigest.getInstance("SHA-256")
@@ -22,8 +24,9 @@ data class Node(
         }
     }
 
-    init {
-        this.name = generateHash(name)
+    constructor(input: String, children: List<Node> = emptyList()) : this() {
+        this.name = generateHash(input)
+        this.children.addAll(children)
     }
 }
 
