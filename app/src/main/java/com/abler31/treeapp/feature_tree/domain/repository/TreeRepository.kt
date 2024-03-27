@@ -1,9 +1,11 @@
 package com.abler31.treeapp.feature_tree.domain.repository
 
 import com.abler31.treeapp.feature_tree.domain.model.Node
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 
 interface TreeRepository {
-    suspend fun insertNode(node: Node)
+    suspend fun saveTreeState(node: Node)
 
-    suspend fun deleteNode(node: Node)
+    fun loadTreeState(): Flow<Node?>
 }

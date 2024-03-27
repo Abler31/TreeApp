@@ -2,13 +2,14 @@ package com.abler31.treeapp.feature_tree.domain.usecase
 
 import com.abler31.treeapp.feature_tree.domain.model.Node
 import com.abler31.treeapp.feature_tree.domain.repository.TreeRepository
+import kotlinx.coroutines.flow.Flow
 
-class DeleteNode(
+class LoadTreeState(
     private val repository: TreeRepository
 ) {
 
-    suspend operator fun invoke(node: Node){
-        repository.deleteNode(node = node)
+    operator fun invoke(): Flow<Node?> {
+        return repository.loadTreeState()
     }
 
 }

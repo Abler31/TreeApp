@@ -1,16 +1,17 @@
 package com.abler31.treeapp.di
 
-import android.app.Application
-import androidx.room.Room
-import com.abler31.treeapp.feature_tree.data.data_source.TreeDatabase
+import android.content.Context
+import com.abler31.treeapp.feature_tree.data.data_source.DataStore
+import com.abler31.treeapp.feature_tree.data.data_source.TreeStateDataStore
 import com.abler31.treeapp.feature_tree.data.repository.TreeRepositoryImpl
 import com.abler31.treeapp.feature_tree.domain.repository.TreeRepository
-import com.abler31.treeapp.feature_tree.domain.usecase.GetNode
-import com.abler31.treeapp.feature_tree.domain.usecase.InsertNode
+import com.abler31.treeapp.feature_tree.domain.usecase.LoadTreeState
+import com.abler31.treeapp.feature_tree.domain.usecase.SaveTreeState
 import com.abler31.treeapp.feature_tree.domain.usecase.TreeUseCases
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -20,26 +21,20 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideTreeDatabase(app: Application): TreeDatabase{
-        return Room.databaseBuilder(
-            app,
-            TreeDatabase::class.java,
-            TreeDatabase.DATABASE_NAME
-        ).build()
+    fun provideDataStore(@ApplicationContext context: Context): DataStore{
+        return TreeStateDataStore(context)
     }
-
     @Provides
     @Singleton
-    fun provideTreeRepository(db: TreeDatabase): TreeRepository{
-        return TreeRepositoryImpl(db.treeDao)
+    fun provideRepository(dataStore: DataStore): TreeRepository{
+        return TreeRepositoryImpl(dataStore)
     }
-
     @Provides
     @Singleton
     fun provideTreeUseCases(repository: TreeRepository): TreeUseCases{
         return TreeUseCases(
-            getNode = GetNode(repository),
-            insertNode = InsertNode(repository)
+            loadTreeState = LoadTreeState(repository),
+            saveTreeState = SaveTreeState(repository)
         )
     }
 }
