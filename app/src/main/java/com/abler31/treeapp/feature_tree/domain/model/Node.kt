@@ -11,7 +11,6 @@ data class Node(
     @SerializedName("name") var name: String = "",
     @SerializedName("parent") var parent: Node? = null,
     @SerializedName("children") var children: MutableList<Node> = mutableListOf(),
-    private var idCounter: Int = 0 // статический idCounter
 ) : Parcelable {
 
     companion object {
@@ -25,7 +24,7 @@ data class Node(
     }
 
     init {
-        ++staticIdCounter // Увеличиваем статический счетчик только при создании нового экземпляра Node
+        ++staticIdCounter
         if (name.isEmpty()) {
             this.name = generateHash("Node $staticIdCounter")
         } else {
@@ -38,7 +37,7 @@ data class Node(
         if (this === other) return true
         if (other !is Node) return false
 
-        // Сравниваем только свойства name и parent, не включая children
+        // stackoverflow avoiding
         return name == other.name && parent == other.parent
     }
 

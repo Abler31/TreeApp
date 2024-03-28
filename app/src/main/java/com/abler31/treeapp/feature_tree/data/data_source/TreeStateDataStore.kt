@@ -24,9 +24,7 @@ class TreeStateDataStore(private val context: Context) :
     }
 
     override suspend fun saveTreeState(treeRoot: Node) {
-        Log.d("test", "до edit")
         context.dataStore.edit { preferences ->
-            Log.d("test", "после edit")
             val nodeData = treeRoot.toNodeData()
             preferences[TREE_ROOT_KEY] = Gson().toJson(nodeData)
         }

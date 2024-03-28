@@ -62,7 +62,12 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     treeRoot?.children?.firstOrNull()?.let { Log.d("test", it.name) }
-                    treeRoot?.let { TreeScreen(rootNode = it, onSaveTreeState = viewModel::saveTreeState) }
+                    treeRoot?.let {
+                        TreeScreen(
+                            rootNode = it,
+                            onSaveTreeState = viewModel::saveTreeState
+                        )
+                    }
                 }
             }
         }
@@ -101,7 +106,7 @@ fun TreeScreenPreview() {
 @Composable
 fun TreeContent(node: Node, onSaveTreeState: (Node) -> Unit) {
     var currentNode by rememberSaveable {
-        mutableStateOf<Node>(node)
+        mutableStateOf(node)
     }
     var childrenList = remember {
         currentNode.children.toMutableStateList()

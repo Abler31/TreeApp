@@ -1,4 +1,4 @@
-package com.abler31.treeapp
+package com.abler31.treeapp.app
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

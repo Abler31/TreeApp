@@ -1,6 +1,5 @@
 package com.abler31.treeapp.feature_tree.presentation
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -15,7 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class TreeViewModel @Inject constructor(
     private val treeUseCases: TreeUseCases
-): ViewModel() {
+) : ViewModel() {
 
     private val _treeRoot = MutableLiveData<Node?>()
     val treeRoot: LiveData<Node?> = _treeRoot
@@ -31,7 +30,6 @@ class TreeViewModel @Inject constructor(
     fun saveTreeState(treeRoot: Node) {
         viewModelScope.launch(Dispatchers.IO) {
             treeUseCases.saveTreeState.invoke(treeRoot)
-            Log.d("test", "кончание работы save")
         }
     }
 
