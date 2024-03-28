@@ -2,9 +2,8 @@ package com.abler31.treeapp.feature_tree.data.utils
 
 import com.abler31.treeapp.feature_tree.domain.model.Node
 import com.google.gson.annotations.SerializedName
-import kotlinx.serialization.Serializable
 
-@Serializable
+
 data class NodeData(
     @SerializedName("name") val name: String,
     @SerializedName("children") val children: List<NodeData>

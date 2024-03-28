@@ -3,7 +3,6 @@ package com.abler31.treeapp.feature_tree.domain.model
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
-import kotlinx.serialization.Serializable
 import java.security.MessageDigest
 
 @Parcelize
