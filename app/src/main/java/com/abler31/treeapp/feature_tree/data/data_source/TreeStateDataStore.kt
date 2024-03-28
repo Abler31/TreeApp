@@ -20,7 +20,7 @@ class TreeStateDataStore(private val context: Context) :
     companion object {
         private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "tree_state")
         val TREE_ROOT_KEY = stringPreferencesKey("tree_root")
-        val DEFAULT_TREE_ROOT = Node("Root", null)
+        val DEFAULT_TREE_ROOT = Node(Node.generateHash("Root"), null)
     }
 
     override suspend fun saveTreeState(treeRoot: Node) {

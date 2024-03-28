@@ -16,13 +16,12 @@ data class Node(
 
     companion object {
         private var staticIdCounter: Int = 0
-    }
-
-    // Node hash name generation
-    private fun generateHash(input: String): String {
-        val md = MessageDigest.getInstance("SHA-256")
-        val hashBytes = md.digest(input.toByteArray())
-        return hashBytes.joinToString("") { "%02x".format(it) }.substring(0, 20)
+        // Node hash name generation
+        fun generateHash(input: String): String {
+            val md = MessageDigest.getInstance("SHA-256")
+            val hashBytes = md.digest(input.toByteArray())
+            return hashBytes.joinToString("") { "%02x".format(it) }.substring(0, 20)
+        }
     }
 
     init {
