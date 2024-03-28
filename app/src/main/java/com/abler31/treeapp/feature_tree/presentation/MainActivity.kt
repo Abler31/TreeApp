@@ -1,6 +1,7 @@
 package com.abler31.treeapp.feature_tree.presentation
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -60,6 +61,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    treeRoot?.children?.firstOrNull()?.let { Log.d("test", it.name) }
                     treeRoot?.let { TreeScreen(rootNode = it, onSaveTreeState = viewModel::saveTreeState) }
                 }
             }
